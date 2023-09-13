@@ -1,0 +1,40 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=grafana
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-enterprise
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - pgadmin
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=postgres
+      - GF_DATABASE_PASSWORD=postgres
+      - GF_DATABASE_SSL_MODE=disable
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    ports:
+      - 8080:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=test123
